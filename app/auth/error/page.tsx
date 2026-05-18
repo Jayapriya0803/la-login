@@ -1,66 +1,114 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
-import ClaudeLogo from "@/components/ClaudeLogo";
+import { Suspense } from "react";
 
-const errorMessages: Record<string, string> = {
-  Configuration: "There is a problem with the server configuration.",
-  AccessDenied: "You do not have permission to sign in.",
-  Verification: "The verification token has expired or has already been used.",
-  Default: "An unexpected error occurred. Please try again.",
-};
+function AuthErrorContent() {
+  const searchParams = useSearchParams();
+  const error = searchParams.get("error");
 
-export default function AuthError() {
-  const params = useSearchParams();
-  const error = params.get("error") ?? "Default";
-  const message = errorMessages[error] ?? errorMessages.Default;
+  const errorMessages: Record<string, string> = {
+    OAuthSignin: "Error starting Google sign-in. Please try again.",
+    OAuthCallback: "Error during Google sign-in. Please try again.",
+    OAuthCreateAccount: "Could not create account. Please try again.",
+    EmailCreateAccount: "Could not create account. Please try again.",
+    Callback: "Error during sign-in callback. Please try again.",
+    AccessDenied: "Access denied. You may not have permission.",
+    Verification: "The verification link has expired. Please try again.",
+    Default: "An error occurred during sign-in. Please try again.",
+  };
+
+  const message = error ? errorMessages[error] ?? errorMessages.Default : errorMessages.Default;
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center px-5"
-      style={{ background: "var(--color-bg)" }}
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "var(--color-bg)",
+        padding: "20px",
+      }}
     >
-      <div className="flex flex-col items-center gap-6 text-center" style={{ maxWidth: 380 }}>
-        <ClaudeLogo size={36} />
+      <div
+        style={{
+          background: "var(--color-surface)",
+          border: "1.5px solid var(--color-border)",
+          borderRadius: "16px",
+          padding: "32px",
+          maxWidth: "400px",
+          width: "100%",
+          textAlign: "center",
+          boxShadow: "0 2px 24px rgba(0,0,0,0.06)",
+        }}
+      >
+        {/* Error icon */}
         <div
-          className="w-14 h-14 rounded-full flex items-center justify-center"
-          style={{ background: "rgba(224,85,85,0.08)" }}
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: "50%",
+            background: "rgba(204,92,92,0.1)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto 16px",
+          }}
         >
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-            <path d="M11 7v5M11 15v.5M11 1C5.477 1 1 5.477 1 11s4.477 10 10 10 10-4.477 10-10S16.523 1 11 1z"
-              stroke="#e05555" strokeWidth="1.8" strokeLinecap="round"/>
+            <path d="M11 7v5M11 15h.01" stroke="#cc5c5c" strokeWidth="2" strokeLinecap="round"/>
+            <circle cx="11" cy="11" r="9" stroke="#cc5c5c" strokeWidth="2"/>
           </svg>
         </div>
-        <div>
-          <h2
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "1.4rem",
-              fontWeight: 500,
-              color: "var(--color-text)",
-              letterSpacing: "-0.02em",
-              marginBottom: 8,
-            }}
-          >
-            Sign-in error
-          </h2>
-          <p style={{ color: "var(--color-muted)", fontSize: "0.9rem", lineHeight: 1.6 }}>
-            {message}
-          </p>
-        </div>
-        <Link
+
+        <h1
+          style={{
+            fontSize: "1.2rem",
+            fontWeight: 600,
+            color: "var(--color-text)",
+            marginBottom: "8px",
+          }}
+        >
+          Sign-in Error
+        </h1>
+
+        <p
+          style={{
+            fontSize: "0.9rem",
+            color: "var(--color-muted)",
+            marginBottom: "24px",
+            lineHeight: 1.5,
+          }}
+        >
+          {message}
+        </p>
+
+        
           href="/"
           style={{
-            fontSize: "0.85rem",
-            color: "var(--color-accent)",
+            display: "inline-block",
+            padding: "10px 24px",
+            borderRadius: "8px",
+            background: "var(--color-accent)",
+            color: "#fff",
             fontWeight: 500,
+            fontSize: "0.9rem",
             textDecoration: "none",
           }}
         >
-          ← Try again
-        </Link>
+          Back to sign-in
+        </a>
       </div>
     </div>
+  );
+}
+
+export default function AuthErrorPage() {
+  return (
+    <Suspense>
+      <AuthErrorContent />
+    </Suspense>
   );
 }
