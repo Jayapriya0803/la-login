@@ -4,28 +4,57 @@ import { useState } from "react";
 import ClaudeLogo from "./ClaudeLogo";
 import OAuthButton from "./OAuthButton";
 import EmailForm from "./EmailForm";
+import { authClient } from "@/lib/auth-client"
 
 type LoadingState = "none" | "google" | "apple" | "email";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState<LoadingState>("none");
   const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const simulateOAuth = (provider: "google" | "apple") => {
-    setLoading(provider);
-    // Simulate OAuth redirect delay
-    setTimeout(() => {
+  const handleGoogle = async () => {
+    setLoading("google");
+    setErrorMsg("");
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/dashboard",
+      });
+    } catch {
       setLoading("none");
-      setSuccessMsg(`Redirecting to ${provider === "google" ? "Google" : "Apple"} sign-in…`);
-    }, 1800);
+      setErrorMsg("Google sign-in failed. Please try again.");
+    }
   };
 
-  const handleEmailSubmit = (email: string) => {
+  const handleApple = async () => {
+    setLoading("apple");
+    setErrorMsg("");
+    try {
+      await authClient.signIn.social({
+        provider: "apple",
+        callbackURL: "/dashboard",
+      });
+    } catch {
+      setLoading("none");
+      setErrorMsg("Apple sign-in failed. Please try again.");
+    }
+  };
+
+  const handleEmailSubmit = async (email: string) => {
     setLoading("email");
-    setTimeout(() => {
+    setErrorMsg("");
+    try {
+      await authClient.signIn.magicLink({
+        email,
+        callbackURL: "/dashboard",
+      });
       setLoading("none");
       setSuccessMsg(`Check your inbox — we sent a link to ${email}`);
-    }, 1800);
+    } catch {
+      setLoading("none");
+      setErrorMsg("Failed to send email. Please try again.");
+    }
   };
 
   return (
@@ -93,6 +122,20 @@ export default function LoginPage() {
             boxShadow: "0 2px 24px rgba(0,0,0,0.06)",
           }}
         >
+          {/* Error message */}
+          {errorMsg && (
+            <div
+              className="text-center py-2 px-3 rounded-lg"
+              style={{
+                background: "rgba(204,92,92,0.08)",
+                color: "#cc5c5c",
+                fontSize: "0.85rem",
+              }}
+            >
+              {errorMsg}
+            </div>
+          )}
+
           {/* Success state */}
           {successMsg ? (
             <div
@@ -104,16 +147,36 @@ export default function LoginPage() {
                 style={{ background: "rgba(204,120,92,0.12)" }}
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M4 10l4 4 8-8" stroke="#CC785C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path
+                    d="M4 10l4 4 8-8"
+                    stroke="#CC785C"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               </div>
-              <p style={{ color: "var(--color-text)", fontSize: "0.92rem", fontWeight: 500 }}>
+              <p
+                style={{
+                  color: "var(--color-text)",
+                  fontSize: "0.92rem",
+                  fontWeight: 500,
+                }}
+              >
                 {successMsg}
               </p>
               <button
-                onClick={() => setSuccessMsg("")}
+                onClick={() => {
+                  setSuccessMsg("");
+                  setErrorMsg("");
+                }}
                 className="mt-4 text-xs underline"
-                style={{ color: "var(--color-muted)", background: "none", border: "none", cursor: "pointer" }}
+                style={{
+                  color: "var(--color-muted)",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
               >
                 Back to sign-in
               </button>
@@ -124,12 +187,12 @@ export default function LoginPage() {
               <div className="flex flex-col gap-3">
                 <OAuthButton
                   provider="google"
-                  onClick={() => simulateOAuth("google")}
+                  onClick={handleGoogle}
                   loading={loading === "google"}
                 />
                 <OAuthButton
                   provider="apple"
-                  onClick={() => simulateOAuth("apple")}
+                  onClick={handleApple}
                   loading={loading === "apple"}
                 />
               </div>
@@ -156,30 +219,25 @@ export default function LoginPage() {
             maxWidth: 320,
           }}
         >
-          By continuing, you agree to Anthropic&apos;s{" "}
-          <a
-            href="https://www.anthropic.com/legal/consumer-terms"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: "var(--color-text)", textDecoration: "underline", textUnderlineOffset: 2 }}
+          By continuing, you agree to Lokalads&apos;{" "}
+          
+            <a href="/terms"
+            style={{
+              color: "var(--color-text)",
+              textDecoration: "underline",
+              textUnderlineOffset: 2,
+            }}
           >
-            Consumer Terms
+            Terms of Service
           </a>{" "}
           and{" "}
-          <a
-            href="https://www.anthropic.com/legal/usage-policy"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: "var(--color-text)", textDecoration: "underline", textUnderlineOffset: 2 }}
-          >
-            Usage Policy
-          </a>
-          , and acknowledge their{" "}
-          <a
-            href="https://www.anthropic.com/legal/privacy"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: "var(--color-text)", textDecoration: "underline", textUnderlineOffset: 2 }}
+          
+            <a href="/privacy"
+            style={{
+              color: "var(--color-text)",
+              textDecoration: "underline",
+              textUnderlineOffset: 2,
+            }}
           >
             Privacy Policy
           </a>
@@ -192,8 +250,8 @@ export default function LoginPage() {
           style={{ fontSize: "0.82rem", color: "var(--color-muted)" }}
         >
           Don&apos;t have an account?{" "}
-          <a
-            href="/signup"
+          
+            <a href="/signup"
             style={{
               color: "var(--color-accent)",
               textDecoration: "none",
