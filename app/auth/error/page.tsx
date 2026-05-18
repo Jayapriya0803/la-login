@@ -1,24 +1,6 @@
-"use client";
-
-import { useSearchParams } from "next/navigation";
-
 export const dynamic = "force-dynamic";
 
 export default function AuthErrorPage() {
-  const searchParams = useSearchParams();
-  const error = searchParams.get("error") ?? "Default";
-
-  const errorMessages: Record<string, string> = {
-    OAuthSignin: "Error starting Google sign-in. Please try again.",
-    OAuthCallback: "Error during Google sign-in. Please try again.",
-    OAuthCreateAccount: "Could not create account. Please try again.",
-    AccessDenied: "Access denied. You may not have permission.",
-    Verification: "The verification link has expired. Please try again.",
-    Default: "An error occurred during sign-in. Please try again.",
-  };
-
-  const message = errorMessages[error] ?? errorMessages.Default;
-
   return (
     <div
       style={{
@@ -43,6 +25,7 @@ export default function AuthErrorPage() {
           boxShadow: "0 2px 24px rgba(0,0,0,0.06)",
         }}
       >
+        {/* Error Icon */}
         <div
           style={{
             width: 48,
@@ -56,11 +39,17 @@ export default function AuthErrorPage() {
           }}
         >
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-            <path d="M11 7v5M11 15h.01" stroke="#cc5c5c" strokeWidth="2" strokeLinecap="round"/>
-            <circle cx="11" cy="11" r="9" stroke="#cc5c5c" strokeWidth="2"/>
+            <path
+              d="M11 7v5M11 15h.01"
+              stroke="#cc5c5c"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <circle cx="11" cy="11" r="9" stroke="#cc5c5c" strokeWidth="2" />
           </svg>
         </div>
 
+        {/* Title */}
         <h1
           style={{
             fontSize: "1.2rem",
@@ -72,6 +61,7 @@ export default function AuthErrorPage() {
           Sign-in Error
         </h1>
 
+        {/* Message */}
         <p
           style={{
             fontSize: "0.9rem",
@@ -80,9 +70,10 @@ export default function AuthErrorPage() {
             lineHeight: 1.5,
           }}
         >
-          {message}
+          An error occurred during sign-in. Please try again.
         </p>
 
+        {/* Back button */}
         
           <a href="/"
           style={{
