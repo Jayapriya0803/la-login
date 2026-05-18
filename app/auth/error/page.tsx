@@ -1,24 +1,23 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
 
-function AuthErrorContent() {
+export const dynamic = "force-dynamic";
+
+export default function AuthErrorPage() {
   const searchParams = useSearchParams();
-  const error = searchParams.get("error");
+  const error = searchParams.get("error") ?? "Default";
 
   const errorMessages: Record<string, string> = {
     OAuthSignin: "Error starting Google sign-in. Please try again.",
     OAuthCallback: "Error during Google sign-in. Please try again.",
     OAuthCreateAccount: "Could not create account. Please try again.",
-    EmailCreateAccount: "Could not create account. Please try again.",
-    Callback: "Error during sign-in callback. Please try again.",
     AccessDenied: "Access denied. You may not have permission.",
     Verification: "The verification link has expired. Please try again.",
     Default: "An error occurred during sign-in. Please try again.",
   };
 
-  const message = error ? errorMessages[error] ?? errorMessages.Default : errorMessages.Default;
+  const message = errorMessages[error] ?? errorMessages.Default;
 
   return (
     <div
@@ -44,7 +43,6 @@ function AuthErrorContent() {
           boxShadow: "0 2px 24px rgba(0,0,0,0.06)",
         }}
       >
-        {/* Error icon */}
         <div
           style={{
             width: 48,
@@ -86,7 +84,7 @@ function AuthErrorContent() {
         </p>
 
         
-          href="/"
+          <a href="/"
           style={{
             display: "inline-block",
             padding: "10px 24px",
@@ -102,13 +100,5 @@ function AuthErrorContent() {
         </a>
       </div>
     </div>
-  );
-}
-
-export default function AuthErrorPage() {
-  return (
-    <Suspense>
-      <AuthErrorContent />
-    </Suspense>
   );
 }
