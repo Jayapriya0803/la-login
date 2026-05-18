@@ -42,20 +42,21 @@ export default function LoginPage() {
   };
 
   const handleEmailSubmit = async (email: string) => {
-    setLoading("email");
-    setErrorMsg("");
-    try {
-      await authClient.signIn.magicLink({
-        email,
-        callbackURL: "/dashboard",
-      });
-      setLoading("none");
-      setSuccessMsg(`Check your inbox — we sent a link to ${email}`);
-    } catch {
-      setLoading("none");
-      setErrorMsg("Failed to send email. Please try again.");
-    }
-  };
+  setLoading("email");
+  setErrorMsg("");
+  try {
+    await authClient.signIn.email({
+      email,
+      password: "dummy", // remove if you add a password field
+      callbackURL: "/dashboard",
+    });
+    setLoading("none");
+    setSuccessMsg(`Signed in as ${email}`);
+  } catch {
+    setLoading("none");
+    setErrorMsg("Failed to sign in. Please try again.");
+  }
+};
 
   return (
     <div
